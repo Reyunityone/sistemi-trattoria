@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--dependency-file=CMakeFiles/trattoria_client.dir/link.d CMakeFiles/trattoria_client.dir/src/trattoria_client.c.o -o trattoria_client  -lpthread
