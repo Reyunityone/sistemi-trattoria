@@ -18,6 +18,6 @@ int main(int argc, char **argv) {
     strncpy(hello_msg.studentids[2], "VR516245", STUDENTID_MAXLEN - 1);
     int key = ftok(TRATTORIA_FTOK_PATH, PROJ_MSG_C2S);
     int msqid = msgget(key, 0); 
-    if(msgsnd(msqid, &hello_msg, sizeof(hello_msg) - sizeof(long), 0) == -1) printf("erroraccio");
+    if(msgsnd(msqid, &hello_msg, sizeof(hello_msg) - sizeof(long), 0) == -1) printf("maurizio");
     return 0;
 }
