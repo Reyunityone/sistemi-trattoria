@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/home/reyunityone/Documents/Sistemi/build",
-  "command": "/usr/bin/gcc -isystem /home/reyunityone/Documents/Sistemi/include -g -std=gnu11 -o CMakeFiles/trattoria_client.dir/src/trattoria_client.c.o -c /home/reyunityone/Documents/Sistemi/src/trattoria_client.c",
-  "file": "/home/reyunityone/Documents/Sistemi/src/trattoria_client.c",
-  "output": "/home/reyunityone/Documents/Sistemi/build/CMakeFiles/trattoria_client.dir/src/trattoria_client.c.o"
-}
-]
