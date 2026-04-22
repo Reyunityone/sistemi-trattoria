@@ -1,3 +1,0 @@
-/home/reyunityone/Documents/Sistemi/build/CMakeFiles/trattoria_client.dir
-/home/reyunityone/Documents/Sistemi/build/CMakeFiles/edit_cache.dir
-/home/reyunityone/Documents/Sistemi/build/CMakeFiles/rebuild_cache.dir
