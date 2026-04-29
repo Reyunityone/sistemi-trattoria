@@ -2,9 +2,24 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/ipc.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <scenario.h>
 #include <sys/msg.h>
+
+char* SKILLS_TO_STRING[] = {"waiter", "cook", "helper", "cashier"};
+char* TRAITS_TO_STRING[] = {"patience", "sociability", "professionality", "resistance"};
+void print_waiters(msg_welcome_t welcome){
+    printf("\n");
+    for(int i = 0; i < welcome.staff_n; i++){
+        printf("%s statistiche: \n", welcome.staff[i].name);
+        for(int j = 0; j < NUM_SKILLS; j++){
+            char* current_skill = SKILLS_TO_STRING[j];
+            char* current_trait = TRAITS_TO_STRING[j];
+            printf("\t%s: %i %s: %i\n",current_skill,welcome.staff[i].skills[j],current_trait, welcome.staff[i].traits[j]);
+        }
+    }
+}
 
 int begin_handshake(strategy_t strategy){
     char* strategy_string;
@@ -21,7 +36,7 @@ int begin_handshake(strategy_t strategy){
     strncpy(hello_msg.studentids[1], "VR517631", STUDENTID_MAXLEN - 1); 
     strncpy(hello_msg.studentids[2], "VR516245", STUDENTID_MAXLEN - 1);
     int key = ftok(TRATTORIA_FTOK_PATH, PROJ_MSG_C2S);
-    int msqid = msgget(key, 0); 
+    int msqid = msgget(key, S_IWUSR | S_IRUSR); 
     return msgsnd(msqid, &hello_msg, sizeof(hello_msg) - sizeof(long), 0);
 }
 
@@ -54,5 +69,13 @@ int main(int argc, char **argv) {
             if(strncmp(strategy, "reputation", strlen("reputation"))) begin_handshake(STRATEGY_REPUTATION);
         }
     }
-    else begin_handshake_nostrategy(); 
+    else begin_handshake_nostrategy();
+    
+    key_t key = ftok(TRATTORIA_FTOK_PATH, PROJ_MSG_S2C);
+    int msqid = msgget(key, S_IRUSR);
+    msg_welcome_t welcome;
+    if(msgrcv(msqid, &welcome, sizeof(welcome) - sizeof(long), MSGTYPE_WELCOME, 0) == -1) return -1;
+
+    print_waiters(welcome);
+    
 }
