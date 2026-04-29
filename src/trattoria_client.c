@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/ipc.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <scenario.h>
 #include <sys/msg.h>
@@ -21,7 +22,7 @@ int begin_handshake(strategy_t strategy){
     strncpy(hello_msg.studentids[1], "VR517631", STUDENTID_MAXLEN - 1); 
     strncpy(hello_msg.studentids[2], "VR516245", STUDENTID_MAXLEN - 1);
     int key = ftok(TRATTORIA_FTOK_PATH, PROJ_MSG_C2S);
-    int msqid = msgget(key, 0); 
+    int msqid = msgget(key, S_IWUSR | S_IRUSR); 
     return msgsnd(msqid, &hello_msg, sizeof(hello_msg) - sizeof(long), 0);
 }
 
@@ -54,5 +55,10 @@ int main(int argc, char **argv) {
             if(strncmp(strategy, "reputation", strlen("reputation"))) begin_handshake(STRATEGY_REPUTATION);
         }
     }
-    else begin_handshake_nostrategy(); 
+    else begin_handshake_nostrategy();
+    
+    key_t key = ftok(TRATTORIA_FTOK_PATH, PROJ_MSG_S2C);
+    int msqid = msgget(key, S_IRUSR);
+    msg_welcome_t welcome;
+    if(msgrcv(msqid, &welcome, sizeof(welcome) - sizeof(long), MSGTYPE_WELCOME, 0) == -1) printf("erroraccio");
 }
