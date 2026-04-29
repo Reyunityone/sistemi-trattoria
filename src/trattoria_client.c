@@ -7,6 +7,19 @@
 #include <scenario.h>
 #include <sys/msg.h>
 
+char* SKILLS_TO_STRING[] = {"waiter", "cook", "helper", "cashier"};
+
+void print_waiters(msg_welcome_t welcome){
+    printf("\n");
+    for(int i = 0; i < welcome.staff_n; i++){
+        printf("%s statistiche: \n", welcome.staff[i].name);
+        for(int j = 0; j < NUM_SKILLS; j++){
+            char* current_skill = SKILLS_TO_STRING[j];
+            printf("\t%s: %i\n",current_skill,welcome.staff[i].skills[j]);
+        }
+    }
+}
+
 int begin_handshake(strategy_t strategy){
     char* strategy_string;
     if(strategy == STRATEGY_REPUTATION) strategy_string = "reputation";
@@ -60,5 +73,8 @@ int main(int argc, char **argv) {
     key_t key = ftok(TRATTORIA_FTOK_PATH, PROJ_MSG_S2C);
     int msqid = msgget(key, S_IRUSR);
     msg_welcome_t welcome;
-    if(msgrcv(msqid, &welcome, sizeof(welcome) - sizeof(long), MSGTYPE_WELCOME, 0) == -1) printf("erroraccio");
+    if(msgrcv(msqid, &welcome, sizeof(welcome) - sizeof(long), MSGTYPE_WELCOME, 0) == -1) return -1;
+
+    print_waiters(welcome);
+    
 }
