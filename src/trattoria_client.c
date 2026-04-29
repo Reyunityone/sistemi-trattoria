@@ -8,14 +8,15 @@
 #include <sys/msg.h>
 
 char* SKILLS_TO_STRING[] = {"waiter", "cook", "helper", "cashier"};
-
+char* TRAITS_TO_STRING[] = {"patience", "sociability", "professionality", "resistance"};
 void print_waiters(msg_welcome_t welcome){
     printf("\n");
     for(int i = 0; i < welcome.staff_n; i++){
         printf("%s statistiche: \n", welcome.staff[i].name);
         for(int j = 0; j < NUM_SKILLS; j++){
             char* current_skill = SKILLS_TO_STRING[j];
-            printf("\t%s: %i\n",current_skill,welcome.staff[i].skills[j]);
+            char* current_trait = TRAITS_TO_STRING[j];
+            printf("\t%s: %i %s: %i\n",current_skill,welcome.staff[i].skills[j],current_trait, welcome.staff[i].traits[j]);
         }
     }
 }
