@@ -6,9 +6,11 @@
 #include <unistd.h>
 #include <scenario.h>
 #include <sys/msg.h>
+#include <pthread.h>
 
 char* SKILLS_TO_STRING[] = {"waiter", "cook", "helper", "cashier"};
 char* TRAITS_TO_STRING[] = {"patience", "sociability", "professionality", "resistance"};
+strategy_t STRATEGY;
 void print_waiters(msg_welcome_t welcome){
     printf("\n");
     for(int i = 0; i < welcome.staff_n; i++){
@@ -19,6 +21,27 @@ void print_waiters(msg_welcome_t welcome){
             printf("\t%s: %i %s: %i\n",current_skill,welcome.staff[i].skills[j],current_trait, welcome.staff[i].traits[j]);
         }
     }
+}
+
+void update_role(staff_member_t membro){
+    if(STRATEGY == STRATEGY_PROFIT){
+
+    }
+}
+
+void *worker(void* arg){
+    staff_member_t membro = *(staff_member_t*) arg;
+    while(1){
+        update_role(membro);
+        sleep(2);
+    }
+    return 0;
+}
+
+int receive_welcome(msg_welcome_t* welcome){
+    key_t key = ftok(TRATTORIA_FTOK_PATH, PROJ_MSG_S2C);
+    int msqid = msgget(key, S_IRUSR);
+    return msgrcv(msqid, welcome, sizeof(*welcome) - sizeof(long), MSGTYPE_WELCOME, 0);
 }
 
 int begin_handshake(strategy_t strategy){
@@ -65,17 +88,28 @@ int main(int argc, char **argv) {
             }
         }
         if(strategy != NULL){
-            if(strncmp(strategy, "profit", strlen("profit"))) begin_handshake(STRATEGY_PROFIT);
-            if(strncmp(strategy, "reputation", strlen("reputation"))) begin_handshake(STRATEGY_REPUTATION);
+            if(strncmp(strategy, "profit", strlen("profit")) == 0){
+                STRATEGY = STRATEGY_PROFIT;
+            }
+            else if(strncmp(strategy, "reputation", strlen("reputation")) == 0){
+                STRATEGY = STRATEGY_REPUTATION;
+            }
+            begin_handshake(STRATEGY);
         }
     }
     else begin_handshake_nostrategy();
     
-    key_t key = ftok(TRATTORIA_FTOK_PATH, PROJ_MSG_S2C);
-    int msqid = msgget(key, S_IRUSR);
-    msg_welcome_t welcome;
-    if(msgrcv(msqid, &welcome, sizeof(welcome) - sizeof(long), MSGTYPE_WELCOME, 0) == -1) return -1;
-
-    print_waiters(welcome);
     
+    msg_welcome_t welcome;
+    receive_welcome(&welcome); 
+    print_waiters(welcome);
+
+    pthread_t worker_threads[MAX_STAFF];
+    for(int i = 0; i < welcome.staff_n; i++){
+      pthread_create(&worker_threads[i],NULL , worker, &welcome.staff[i]);
+    }
+   
+    for(int i = 0; i < welcome.staff_n; i++){
+       pthread_join(worker_threads[i], NULL);
+    }
 }
